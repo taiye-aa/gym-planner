@@ -6,9 +6,12 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
+import { NeonAuthUIProvider } from '@neondatabase/neon-js/auth/react';
+import { authClient } from "./lib/auth";
 import type { Route } from "./+types/root";
 import "./app.css";
+import AuthProvider from "./context/AuthContext";
+import { QueryClient, QueryClientContext, QueryClientProvider } from "@tanstack/react-query";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -42,7 +45,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const queryClient = new QueryClient()
+  return (
+    <NeonAuthUIProvider authClient={authClient} defaultTheme="dark">
+      <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
+      </QueryClientProvider>
+    </NeonAuthUIProvider>
+  )
+
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
